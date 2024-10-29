@@ -60,3 +60,19 @@ def update_task(task_id):
 
     return jsonify(task.to_dict()), 200
 
+@tasks_bp.route('/tasks/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    global tasks  # vérifie la liste des tâches
+
+    # Recherche la tâche par ID
+    task = next((task for task in tasks if task.id == task_id), None)
+    
+    if task is None:
+        return jsonify({"error": "Task not found!"}), 404
+
+    # Supprime la tâche
+    tasks = [t for t in tasks if t.id != task_id]
+    
+    return jsonify({"message": "Task deleted successfully!"}), 200
+
+
