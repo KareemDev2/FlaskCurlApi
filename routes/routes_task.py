@@ -25,3 +25,14 @@ def create_tasks():
 
     tasks.append(task)
     return jsonify(task.to_dict()), 201
+
+@tasks_bp.route('/tasks/<int:task_id>', methods=['GET'])
+def get_task(task_id):
+    # Recherche la tâche par ID
+    task = next((task for task in tasks if task.id == task_id), None)
+    
+    if task is None:
+        return jsonify({"error": "Task not found!"}), 404
+    
+    return jsonify(task.to_dict()), 200
+
