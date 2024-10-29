@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request
 from ..models.task import Task
+from datetime import datetime,timezone
+
 
 tasks_bp = Blueprint('tasks', __name__)
 
@@ -34,5 +36,27 @@ def get_task(task_id):
     if task is None:
         return jsonify({"error": "Task not found!"}), 404
     
+    return jsonify(task.to_dict()), 200
+
+
+@tasks_bp.route('/tasks/<int:task_id>', methods=['PUT'])
+def update_task(task_id):
+    data = request.get_json()
+    print("Données reçues :", data)  # Log pour vérifier le contenu
+
+    # Recherche la tâche par ID
+    task = next((task for task in tasks if task.id == task_id), None)
+    
+    if task is None:
+        return jsonify({"error": "Task not found!"}), 404
+
+    # Vérifie si le corps de la requête contient une nouvelle tâche
+    if not data or 'task' not in data: 
+        return jsonify({"error": "Task is required in request body!"}), 400
+
+    # Met à jour la tâche
+    task.task = data['task']
+    task.updated_at = datetime.now(timezone.utc)  # Met à jour la date de modification en UTC
+
     return jsonify(task.to_dict()), 200
 
